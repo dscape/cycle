@@ -1,7 +1,7 @@
 { "name"        : "cycle"
 , "description" : "decycle your json"
 , "author"      : ""
-, "version"     : "1.0.1"
+, "version"     : "1.0.2"
 , "main"        : "./cycle.js"
 , "homepage"    : "https://github.com/douglascrockford/JSON-js"
 , "repository"  : 
