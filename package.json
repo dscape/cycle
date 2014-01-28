@@ -10,4 +10,5 @@
 , "bugs"        : "http://github.com/douglascrockford/JSON-js/issues"
 , "keywords"    : [ "json", "cycle", "stringify", "parse" ]
 , "engines"     : { "node" : ">=0.4.0" }
+, "scripts"     : { "test" : "node test/decycle-test.js" }
 }
