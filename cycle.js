@@ -88,15 +88,34 @@ cycle.decycle = function decycle(object) {
 // If it is an object, replicate the object.
 
                 nu = {};
-                for (name in value) {
+
+                var obj = value,
+                    props = [],
+                    prop,
+                    names,
+                    name;
+
+                do {
+                    names = Object.getOwnPropertyNames(obj);
+                    for (i = 0; i < names.length; i+=1) {
+                        prop = names[i];
+                        if (props.indexOf(prop) === -1) {
+                            props.push(prop);
+                        }
+                    }
+                } while (obj = Object.getPrototypeOf(obj));
+
+                for (i = 0; i < props.length; i +=1) {
+                    name = props[i];
                     if (Object.prototype.hasOwnProperty.call(value, name)) {
-                        nu[name] = derez(value[name],
-                            path + '[' + JSON.stringify(name) + ']');
+                        nu[name] = derez(value[name], path + '[' + JSON.stringify(name) + ']');
                     }
                 }
             }
+
             return nu;
         }
+
         return value;
     }(object, '$'));
 };
