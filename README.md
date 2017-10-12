@@ -1,4 +1,4 @@
-![NPM Downloads](http://img.shields.io/npm/dm/cycle.svg?style=flat) ![NPM Version](http://img.shields.io/npm/v/cycle.svg?style=flat)
+![NPM Downloads](http://img.shields.io/npm/dm/cycle.svg?style=flat) [![jsDelivr Hits](https://data.jsdelivr.com/v1/package/npm/cycle/badge?style=rounded)](https://www.jsdelivr.com/package/npm/cycle) ![NPM Version](http://img.shields.io/npm/v/cycle.svg?style=flat)
 
 Fork of https://github.com/douglascrockford/JSON-js, maintained in npm as `cycle`.
 
