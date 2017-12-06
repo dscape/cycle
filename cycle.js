@@ -21,6 +21,63 @@
 
 var cycle = exports;
 
+function derez(value, path, objects, paths) {
+
+// The derez recurses through the object, producing the deep copy.
+
+    var i,          // The loop counter
+        name,       // Property name
+        nu;         // The new object or array
+
+// typeof null === 'object', so go on if this value is really an object but not
+// one of the weird builtin objects.
+
+    if (typeof value === 'object' && value !== null &&
+            !(value instanceof Boolean) &&
+            !(value instanceof Date)    &&
+            !(value instanceof Number)  &&
+            !(value instanceof RegExp)  &&
+            !(value instanceof String)) {
+
+// If the value is an object or array, look to see if we have already
+// encountered it. If so, return a $ref/path object. This is a hard way,
+// linear search that will get slower as the number of unique objects grows.
+
+        i = objects.indexOf(value);
+        if (i !== -1) {
+            return {$ref: paths[i]};
+        }
+
+// Otherwise, accumulate the unique value and its path.
+
+        objects.push(value);
+        paths.push(path);
+
+// If it is an array, replicate the array.
+
+        if (Array.isArray(value)) {
+            nu = [];
+            for (i = 0; i < value.length; i += 1) {
+                nu[i] = derez(value[i], path + '[' + i + ']', objects, paths);
+            }
+        } else {
+
+// If it is an object, replicate the object.
+
+            nu = {};
+            for (name in value) {
+                if (Object.prototype.hasOwnProperty.call(value, name)) {
+                    nu[name] = derez(value[name],
+                        path + '[' + JSON.stringify(name) + ']',
+                        objects, paths);
+                }
+            }
+        }
+        return nu;
+    }
+    return value;
+}
+
 cycle.decycle = function decycle(object) {
     'use strict';
 
@@ -43,62 +100,7 @@ cycle.decycle = function decycle(object) {
     var objects = [],   // Keep a reference to each unique object or array
         paths = [];     // Keep the path to each unique object or array
 
-    return (function derez(value, path) {
-
-// The derez recurses through the object, producing the deep copy.
-
-        var i,          // The loop counter
-            name,       // Property name
-            nu;         // The new object or array
-
-// typeof null === 'object', so go on if this value is really an object but not
-// one of the weird builtin objects.
-
-        if (typeof value === 'object' && value !== null &&
-                !(value instanceof Boolean) &&
-                !(value instanceof Date)    &&
-                !(value instanceof Number)  &&
-                !(value instanceof RegExp)  &&
-                !(value instanceof String)) {
-
-// If the value is an object or array, look to see if we have already
-// encountered it. If so, return a $ref/path object. This is a hard way,
-// linear search that will get slower as the number of unique objects grows.
-
-            for (i = 0; i < objects.length; i += 1) {
-                if (objects[i] === value) {
-                    return {$ref: paths[i]};
-                }
-            }
-
-// Otherwise, accumulate the unique value and its path.
-
-            objects.push(value);
-            paths.push(path);
-
-// If it is an array, replicate the array.
-
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
-                nu = [];
-                for (i = 0; i < value.length; i += 1) {
-                    nu[i] = derez(value[i], path + '[' + i + ']');
-                }
-            } else {
-
-// If it is an object, replicate the object.
-
-                nu = {};
-                for (name in value) {
-                    if (Object.prototype.hasOwnProperty.call(value, name)) {
-                        nu[name] = derez(value[name],
-                            path + '[' + JSON.stringify(name) + ']');
-                    }
-                }
-            }
-            return nu;
-        }
-        return value;
-    }(object, '$'));
+    return derez(object, '$', objects, paths);
 };
 
 
@@ -137,7 +139,7 @@ cycle.retrocycle = function retrocycle($) {
         var i, item, name, path;
 
         if (value && typeof value === 'object') {
-            if (Object.prototype.toString.apply(value) === '[object Array]') {
+            if (Array.isArray(value)) {
                 for (i = 0; i < value.length; i += 1) {
                     item = value[i];
                     if (item && typeof item === 'object') {
